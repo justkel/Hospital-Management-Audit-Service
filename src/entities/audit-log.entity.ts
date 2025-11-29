@@ -65,4 +65,8 @@ export class AuditLog extends Model {
   @Field()
   @Column(DataType.DATE)
   createdAt: Date;
+
+  @Field()
+  @Column(DataType.DATE)
+  updatedAt: Date;
 }

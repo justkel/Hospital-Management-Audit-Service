@@ -1,0 +1,4 @@
+modulesContainer.addRpcTarget is not a functionTypeError: modulesContainer.addRpcTarget is not a function
+
+
+yarn add @nestjs/core@10 @nestjs/common@10 @nestjs/microservices@10
