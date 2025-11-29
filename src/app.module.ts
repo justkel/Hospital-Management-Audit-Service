@@ -1,7 +1,10 @@
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import {
+  ApolloFederationDriver,
+  ApolloFederationDriverConfig,
+} from '@nestjs/apollo';
 import { join } from 'path';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
@@ -33,13 +36,15 @@ import { CoreModule } from './core.module';
       }),
     }),
 
-    GraphQLModule.forRoot<ApolloDriverConfig>({
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-      driver: ApolloDriver,
+    GraphQLModule.forRoot<ApolloFederationDriverConfig>({
+      driver: ApolloFederationDriver,
+      autoSchemaFile: {
+        federation: 2,
+        path: join(process.cwd(), 'src/schema.gql'),
+      },
       sortSchema: true,
       playground: true,
     }),
-
     AuditModule,
     CoreModule,
   ],
