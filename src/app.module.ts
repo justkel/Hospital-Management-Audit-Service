@@ -7,6 +7,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { AuditLog } from './entities/audit-log.entity';
 import { AuditModule } from './modules/audit/audit.module';
+import { CoreModule } from './core.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { AuditModule } from './modules/audit/audit.module';
     }),
 
     AuditModule,
+    CoreModule,
   ],
 })
 export class AppModule {}
