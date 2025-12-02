@@ -1,10 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { RMQ_QUEUES } from '@justkel/shared';
+import { GatewayAccessGuard, RMQ_QUEUES } from '@justkel/shared';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.useGlobalGuards(new GatewayAccessGuard());
 
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
@@ -13,6 +14,10 @@ async function bootstrap() {
       queue: RMQ_QUEUES.HOSPITAL_AUDIT_LOG,
       queueOptions: {
         durable: true,
+      },
+      socketOptions: {
+        heartbeatIntervalInSeconds: 5,
+        reconnectTimeInSeconds: 5,
       },
     },
   });

@@ -881,10 +881,10 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@justkel/shared@^1.0.6":
-  version "1.0.6"
-  resolved "https://npm.pkg.github.com/download/@justkel/shared/1.0.6/bc2900c67ccdfbd85535d33074d45ae96b884dba#bc2900c67ccdfbd85535d33074d45ae96b884dba"
-  integrity sha512-zqj28q0E39TRQ5yHkx1rkPleKbEXrmXzCTKLrjqXu9S3DdB41Gr8wtdAHtS/LXOxLQeonecbTMeTSq/Yxaj3dg==
+"@justkel/shared@^1.0.8":
+  version "1.0.8"
+  resolved "https://npm.pkg.github.com/download/@justkel/shared/1.0.8/527a0b9d4c4f19836f56bf9233bf06ec2b22f132#527a0b9d4c4f19836f56bf9233bf06ec2b22f132"
+  integrity sha512-e4okYhpVIafzhjWVjkhwsHkXWdxUZvEMLdsY8GB0qwmmnuzg+s2TJKupmoPS5oq/OjZBpLwE7DLIUArr1OCmjg==
   dependencies:
     jsonwebtoken "^9.0.2"
 
