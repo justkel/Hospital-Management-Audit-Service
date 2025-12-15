@@ -1,0 +1,55 @@
+version: '3.9'
+
+services:
+  audit-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        GITHUB_ACCESS_TOKEN: ${GITHUB_ACCESS_TOKEN}
+
+    container_name: hospital-audit-service
+    ports:
+      - '9002:9002'
+    environment:
+      NODE_ENV: development
+      PORT: 9002
+
+      # Database
+      DB_HOST: host.docker.internal
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASS: 'Iwuhkel12#'
+      DB_NAME: hospital_audit_db
+
+      #Auth Key
+      JWT_PUBLIC_KEY: |
+        -----BEGIN PUBLIC KEY-----
+        MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyCcmGcqY5MydwHCAwzd7
+        e7GyiDL6YFpZ+sPj2I450pm+pEWvyR4M8v6AuP/ygsYnNKGwVT5ZGrL96tJ/eOmx
+        AAF389mM50Gd7PIrTU20KnzY2kQ+ZPf7GP8nU2kQJJLJlbPIx/1iH95u5EAcFCcg
+        i4K1m57iXGOMt4I0R+ap5s946VNrtWAswYPgypnBIX9VPywIB9LcRS+3v1bvZgCf
+        5DFY24t75TAhbqEiqH2bBMQz4dyRej7B4R8PHIJ4nL6+Inr01/YNHxB0VuDfoOPP
+        WIVlqgd8ovGV1ABhmMOfQcrep+YLpLmieVGGcEJa7zdFD7GTBtlipI1Ih0koBID7
+        7wIDAQAB
+        -----END PUBLIC KEY-----
+
+      # CONNECT TO EXISTING RABBITMQ FROM MAIN SERVICE
+      RABBITMQ_URL: amqp://guest:guest@hospital-rabbitmq:5672
+
+      # Gateway secret
+      GATEWAY_SECRET: super-secret-dev-key
+
+    volumes:
+      - ./audit-service:/usr/src/app
+      - /usr/src/app/node_modules
+
+    command: yarn start:dev
+
+    networks:
+      - hospital-network
+
+networks:
+  hospital-network:
+    external: true
+    name: hospital-network
