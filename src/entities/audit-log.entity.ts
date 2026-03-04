@@ -8,6 +8,7 @@ import {
   Default,
   AllowNull,
 } from 'sequelize-typescript';
+import { GraphQLJSON } from 'graphql-type-json';
 
 @ObjectType()
 @Table({
@@ -58,7 +59,7 @@ export class AuditLog extends Model {
   @Column(DataType.STRING)
   entityId?: string;
 
-  @Field(() => String, { nullable: true })
+  @Field(() => GraphQLJSON, { nullable: true })
   @Column(DataType.JSONB)
   metadata?: Record<string, any>;
 
