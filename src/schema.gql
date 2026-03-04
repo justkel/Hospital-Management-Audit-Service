@@ -2,6 +2,19 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+enum AuditDateFilter {
+  CUSTOM
+  THIS_MONTH
+  THIS_WEEK
+  TODAY
+}
+
+enum AuditDistinctField {
+  ACTION
+  ACTOR_ID
+  ENTITY
+}
+
 type AuditLog {
   action: String!
   actorDescription: String
@@ -12,9 +25,27 @@ type AuditLog {
   entity: String!
   entityId: String
   id: ID!
-  metadata: String
+  metadata: JSON
   organizationId: String!
   updatedAt: DateTime!
+}
+
+input AuditPaginationInput {
+  action: String
+  actorId: String
+  dateFilter: AuditDateFilter
+  endDate: DateTime
+  entity: String
+  limit: Float!
+  page: Float!
+  startDate: DateTime
+}
+
+type AuditPaginationResult {
+  items: [AuditLog!]!
+  page: Int!
+  pageCount: Int!
+  total: Int!
 }
 
 """
@@ -22,6 +53,14 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
 type Query {
+  auditLogs(pagination: AuditPaginationInput!): AuditPaginationResult!
+  getAuditDistinctValues(field: AuditDistinctField!): [String!]!
+  getAuditLogById(id: String!): AuditLog!
   getAuditLogs: [AuditLog!]!
 }
