@@ -30,6 +30,8 @@ RUN yarn install --ignore-engines --network-timeout 100000
 # Copy full project
 COPY --chown=node:node . .
 
+RUN chmod +x ./node_modules/.bin/*
+
 # Build the code
 RUN yarn build
 
