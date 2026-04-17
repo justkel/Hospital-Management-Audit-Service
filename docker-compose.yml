@@ -38,6 +38,10 @@ services:
       # Gateway secret
       GATEWAY_SECRET: super-secret-dev-key
 
+      REDIS_HOST: hospital-redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD:
+
     volumes:
       - ./audit-service:/usr/src/app
       - /usr/src/app/node_modules
