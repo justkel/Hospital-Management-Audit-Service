@@ -30,6 +30,8 @@ RUN yarn install --ignore-engines --network-timeout 100000
 # Copy full project
 COPY --chown=node:node . .
 
+COPY --chown=node:node src/grpc ./src/grpc
+
 RUN chmod +x ./node_modules/.bin/*
 
 # Build the code
@@ -67,6 +69,8 @@ RUN yarn install --ignore-engines --production --network-timeout 100000
 
 # Copy source + dist build
 COPY --chown=node:node . .
+
+COPY --chown=node:node src/grpc ./src/grpc
 COPY --from=development --chown=node:node /home/app/dist ./dist
 
 EXPOSE 3000

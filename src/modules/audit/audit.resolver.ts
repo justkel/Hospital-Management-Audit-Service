@@ -15,20 +15,21 @@ import {
   AuditPaginationResult,
   AuditPaginationInput,
 } from 'src/graphql/types/paginate.type';
+import { GqlJwtAuthGuardWithPV } from 'src/common/guards/gql-auth-with-pv.guard';
 
 @Resolver(() => AuditLog)
 export class AuditResolver {
   constructor(private readonly auditService: AuditService) {}
 
   @Query(() => [AuditLog])
-  @UseGuards(GqlJwtAuthGuard, RolesGuard)
+  @UseGuards(GqlJwtAuthGuardWithPV, RolesGuard)
   @Roles(UserRole.ADMIN)
   async getAuditLogs(@GqlCurrentUser() user: ContextUser) {
     return this.auditService.findAll(user.org);
   }
 
   @Query(() => [String])
-  @UseGuards(GqlJwtAuthGuard, RolesGuard)
+  @UseGuards(GqlJwtAuthGuardWithPV, RolesGuard)
   @Roles(UserRole.ADMIN)
   async getAuditDistinctValues(
     @Args('field', { type: () => AuditDistinctField })
@@ -39,7 +40,7 @@ export class AuditResolver {
   }
 
   @Query(() => AuditLog)
-  @UseGuards(GqlJwtAuthGuard, RolesGuard)
+  @UseGuards(GqlJwtAuthGuardWithPV, RolesGuard)
   @Roles(UserRole.ADMIN)
   async getAuditLogById(
     @Args('id') id: string,
@@ -49,7 +50,7 @@ export class AuditResolver {
   }
 
   @Query(() => AuditPaginationResult, { name: 'auditLogs' })
-  @UseGuards(GqlJwtAuthGuard, RolesGuard)
+  @UseGuards(GqlJwtAuthGuardWithPV, RolesGuard)
   @Roles(UserRole.ADMIN)
   async findAllAuditLogs(
     @GqlCurrentUser() user: ContextUser,

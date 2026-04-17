@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import Redis from 'ioredis';
-import { REDIS_CLIENT, REDIS_KEYS } from 'src/core/redis.constants';
+import { REDIS_CLIENT, REDIS_KEYS } from '@justkel/shared';
 
 @Injectable()
 export class JwtKeyService {
@@ -17,7 +17,6 @@ export class JwtKeyService {
     const now = Date.now();
 
     if (this.cachedKey && now - this.cacheTime < this.CACHE_TTL) {
-      console.log('Using cached JWT public key');
       return this.cachedKey;
     }
 

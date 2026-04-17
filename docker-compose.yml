@@ -38,6 +38,8 @@ services:
       # Gateway secret
       GATEWAY_SECRET: super-secret-dev-key
 
+      AUTH_GRPC_URL: auth-service:50051
+
       REDIS_HOST: hospital-redis
       REDIS_PORT: 6379
       REDIS_PASSWORD:

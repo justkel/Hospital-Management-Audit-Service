@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package auth;
+
+service AuthService {
+  rpc GetStaffById (GetStaffRequest) returns (StaffResponse);
+}
+
+message GetStaffRequest {
+  string id = 1;
+}
+
+message StaffResponse {
+  string id = 1;
+  string email = 2;
+  repeated string roles = 3;
+  string status = 4;
+  int32 passwordVersion = 5;
+}
