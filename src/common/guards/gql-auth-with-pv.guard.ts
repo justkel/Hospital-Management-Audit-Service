@@ -9,6 +9,7 @@ import { ContextUser, StaffStatus } from '@justkel/shared';
 import { GqlJwtAuthGuard } from '@justkel/shared';
 import { AuthClient } from 'src/sdk/auth.client';
 import { TokenBlacklistService } from 'src/services/token-blacklist.service';
+import { GraphQLError } from 'graphql';
 
 @Injectable()
 export class GqlJwtAuthGuardWithPV implements CanActivate {
@@ -32,7 +33,11 @@ export class GqlJwtAuthGuardWithPV implements CanActivate {
       );
 
       if (isBlacklisted) {
-        throw new UnauthorizedException('Token has been revoked');
+        throw new GraphQLError('Token has been revoked', {
+          extensions: {
+            code: 'TOKEN_REVOKED',
+          },
+        });
       }
     }
 
@@ -43,15 +48,21 @@ export class GqlJwtAuthGuardWithPV implements CanActivate {
     }
 
     if (user.pv !== staff.passwordVersion) {
-      throw new UnauthorizedException(
-        'Password changed. Please log in again.',
-      );
+      throw new GraphQLError('Password changed. Please log in again.', {
+        extensions: {
+          code: 'PASSWORD_CHANGED',
+        },
+      });
     }
 
     const isAdmin = staff.roles.includes('ADMIN');
 
     if (staff.status !== StaffStatus.ACTIVE && !isAdmin) {
-      throw new UnauthorizedException('Account is not active.');
+      throw new GraphQLError('Account is not active.', {
+        extensions: {
+          code: 'ACCOUNT_INACTIVE',
+        },
+      });
     }
 
     return true;
