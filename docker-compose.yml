@@ -20,18 +20,6 @@ services:
       DB_PASS: 'Iwuhkel12#'
       DB_NAME: hospital_audit_db
 
-      #Auth Key
-      JWT_PUBLIC_KEY: |
-        -----BEGIN PUBLIC KEY-----
-        MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyCcmGcqY5MydwHCAwzd7
-        e7GyiDL6YFpZ+sPj2I450pm+pEWvyR4M8v6AuP/ygsYnNKGwVT5ZGrL96tJ/eOmx
-        AAF389mM50Gd7PIrTU20KnzY2kQ+ZPf7GP8nU2kQJJLJlbPIx/1iH95u5EAcFCcg
-        i4K1m57iXGOMt4I0R+ap5s946VNrtWAswYPgypnBIX9VPywIB9LcRS+3v1bvZgCf
-        5DFY24t75TAhbqEiqH2bBMQz4dyRej7B4R8PHIJ4nL6+Inr01/YNHxB0VuDfoOPP
-        WIVlqgd8ovGV1ABhmMOfQcrep+YLpLmieVGGcEJa7zdFD7GTBtlipI1Ih0koBID7
-        7wIDAQAB
-        -----END PUBLIC KEY-----
-
       # CONNECT TO EXISTING RABBITMQ FROM MAIN SERVICE
       RABBITMQ_URL: amqp://guest:guest@hospital-rabbitmq:5672
 

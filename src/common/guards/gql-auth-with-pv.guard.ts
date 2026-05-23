@@ -17,7 +17,7 @@ export class GqlJwtAuthGuardWithPV implements CanActivate {
     private readonly baseGuard: GqlJwtAuthGuard,
     private readonly authClient: AuthClient,
     private readonly blacklistService: TokenBlacklistService,
-  ) {}
+  ) { }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const baseOk = await this.baseGuard.canActivate(context);
@@ -47,7 +47,14 @@ export class GqlJwtAuthGuardWithPV implements CanActivate {
       throw new UnauthorizedException('Staff not found');
     }
 
-    if (user.pv !== staff.passwordVersion) {
+    const freshUser: ContextUser = {
+      ...user,
+      roles: staff.roles,
+    };
+
+    req.user = freshUser;
+
+    if (freshUser.pv !== staff.passwordVersion) {
       throw new GraphQLError('Password changed. Please log in again.', {
         extensions: {
           code: 'PASSWORD_CHANGED',

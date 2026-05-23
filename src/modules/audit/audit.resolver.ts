@@ -4,7 +4,6 @@ import { AuditLog } from 'src/entities/audit-log.entity';
 import {
   ContextUser,
   GqlCurrentUser,
-  GqlJwtAuthGuard,
   Roles,
   RolesGuard,
   UserRole,
