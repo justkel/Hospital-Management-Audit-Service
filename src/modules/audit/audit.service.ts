@@ -3,13 +3,14 @@ import { InjectModel } from '@nestjs/sequelize';
 import { AuditLog } from 'src/entities/audit-log.entity';
 import { CreateAuditLogInput } from 'src/modules/audit/dto/create-audit-log.input';
 import { Op, fn, col } from 'sequelize';
-import { AuditDistinctField } from 'src/enums/audit-log.enum';
+import { ActorActivityPeriod, AuditDistinctField } from 'src/enums/audit-log.enum';
 import { buildAuditDateFilter } from 'src/utils/audit-filter.util';
 import { AuditPaginationInput } from 'src/graphql/types/paginate.type';
+import { ActorActivityStats, ActorActivityBucket } from './types/actor-activity-stats.type';
 
 @Injectable()
 export class AuditService {
-  constructor(@InjectModel(AuditLog) private auditLogModel: typeof AuditLog) {}
+  constructor(@InjectModel(AuditLog) private auditLogModel: typeof AuditLog) { }
 
   async create(input: CreateAuditLogInput): Promise<AuditLog> {
     return this.auditLogModel.create({
@@ -102,6 +103,85 @@ export class AuditService {
       total: count,
       page,
       pageCount: Math.ceil(count / limit),
+    };
+  }
+
+  async getActorActivityStats(
+    organizationId: string,
+    actorId: string,
+    period: ActorActivityPeriod,
+  ): Promise<ActorActivityStats> {
+    const truncUnit = period === ActorActivityPeriod.LAST_24_HOURS ? 'hour' : 'day';
+    const bucketCount = period === ActorActivityPeriod.LAST_24_HOURS ? 24 : 7;
+
+    const now = new Date();
+    const currentBucketStart = new Date(now);
+    if (truncUnit === 'hour') {
+      currentBucketStart.setMinutes(0, 0, 0);
+    } else {
+      currentBucketStart.setHours(0, 0, 0, 0);
+    }
+
+    const rangeStart = new Date(currentBucketStart);
+    if (truncUnit === 'hour') {
+      rangeStart.setHours(rangeStart.getHours() - (bucketCount - 1));
+    } else {
+      rangeStart.setDate(rangeStart.getDate() - (bucketCount - 1));
+    }
+
+    const rows = await this.auditLogModel.findAll({
+      attributes: [
+        [fn('date_trunc', truncUnit, col('createdAt')), 'bucket'],
+        [fn('COUNT', col('id')), 'count'],
+      ],
+      where: {
+        organizationId,
+        actorId,
+        createdAt: { [Op.gte]: rangeStart },
+      },
+      group: [fn('date_trunc', truncUnit, col('createdAt'))],
+      raw: true,
+    });
+
+    const countsByBucket = new Map<string, number>();
+    for (const row of rows as unknown as { bucket: Date; count: string }[]) {
+      countsByBucket.set(new Date(row.bucket).toISOString(), Number(row.count));
+    }
+
+    const buckets: ActorActivityBucket[] = [];
+    let total = 0;
+
+    for (let i = bucketCount - 1; i >= 0; i--) {
+      const bucketDate = new Date(currentBucketStart);
+      if (truncUnit === 'hour') {
+        bucketDate.setHours(bucketDate.getHours() - i);
+      } else {
+        bucketDate.setDate(bucketDate.getDate() - i);
+      }
+
+      const key = bucketDate.toISOString();
+      const count = countsByBucket.get(key) ?? 0;
+      total += count;
+
+      buckets.push({
+        label:
+          truncUnit === 'hour'
+            ? bucketDate.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true })
+            : bucketDate.toLocaleDateString('en-US', {
+              weekday: 'short',
+              month: 'short',
+              day: 'numeric',
+            }),
+        timestamp: bucketDate,
+        count,
+      });
+    }
+
+    return {
+      actorId,
+      period,
+      total,
+      buckets,
     };
   }
 }

@@ -20,3 +20,12 @@ export enum AuditDateFilter {
 registerEnumType(AuditDateFilter, {
   name: 'AuditDateFilter',
 });
+
+export enum ActorActivityPeriod {
+  LAST_24_HOURS = 'LAST_24_HOURS',
+  LAST_7_DAYS = 'LAST_7_DAYS',
+}
+
+registerEnumType(ActorActivityPeriod, {
+  name: 'ActorActivityPeriod',
+});

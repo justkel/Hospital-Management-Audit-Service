@@ -2,6 +2,24 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type ActorActivityBucket {
+  count: Int!
+  label: String!
+  timestamp: DateTime!
+}
+
+enum ActorActivityPeriod {
+  LAST_7_DAYS
+  LAST_24_HOURS
+}
+
+type ActorActivityStats {
+  actorId: String!
+  buckets: [ActorActivityBucket!]!
+  period: ActorActivityPeriod!
+  total: Int!
+}
+
 enum AuditDateFilter {
   CUSTOM
   THIS_MONTH
@@ -60,6 +78,7 @@ scalar JSON
 
 type Query {
   auditLogs(pagination: AuditPaginationInput!): AuditPaginationResult!
+  getActorActivityStats(actorId: String!, period: ActorActivityPeriod!): ActorActivityStats!
   getAuditDistinctValues(field: AuditDistinctField!): [String!]!
   getAuditLogById(id: String!): AuditLog!
   getAuditLogs: [AuditLog!]!

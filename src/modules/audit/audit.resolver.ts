@@ -9,16 +9,17 @@ import {
   UserRole,
 } from '@justkel/shared';
 import { UseGuards } from '@nestjs/common';
-import { AuditDistinctField } from 'src/enums/audit-log.enum';
+import { ActorActivityPeriod, AuditDistinctField } from 'src/enums/audit-log.enum';
 import {
   AuditPaginationResult,
   AuditPaginationInput,
 } from 'src/graphql/types/paginate.type';
 import { GqlJwtAuthGuardWithPV } from 'src/common/guards/gql-auth-with-pv.guard';
+import { ActorActivityStats } from './types/actor-activity-stats.type';
 
 @Resolver(() => AuditLog)
 export class AuditResolver {
-  constructor(private readonly auditService: AuditService) {}
+  constructor(private readonly auditService: AuditService) { }
 
   @Query(() => [AuditLog])
   @UseGuards(GqlJwtAuthGuardWithPV, RolesGuard)
@@ -56,5 +57,16 @@ export class AuditResolver {
     @Args('pagination') pagination: AuditPaginationInput,
   ) {
     return this.auditService.findAllPaginated(user.org, pagination);
+  }
+
+  @Query(() => ActorActivityStats)
+  @UseGuards(GqlJwtAuthGuardWithPV, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async getActorActivityStats(
+    @Args('period', { type: () => ActorActivityPeriod })
+    period: ActorActivityPeriod,
+    @GqlCurrentUser() user: ContextUser,
+  ) {
+    return this.auditService.getActorActivityStats(user.org, user.sub, period);
   }
 }
