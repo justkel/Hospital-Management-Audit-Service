@@ -33,7 +33,7 @@
     "@as-integrations/express5": "^1.1.2",
     "@grpc/grpc-js": "^1.14.3",
     "@grpc/proto-loader": "^0.8.0",
-    "@justkel/shared": "^1.0.15",
+    "@justkel/shared": "^1.0.25",
     "@nestjs/apollo": "^13.2.1",
     "@nestjs/common": "10",
     "@nestjs/config": "^4.0.2",
