@@ -60,8 +60,7 @@ export class AuditResolver {
   }
 
   @Query(() => ActorActivityStats)
-  @UseGuards(GqlJwtAuthGuardWithPV, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @UseGuards(GqlJwtAuthGuardWithPV)
   async getActorActivityStats(
     @Args('period', { type: () => ActorActivityPeriod })
     period: ActorActivityPeriod,
