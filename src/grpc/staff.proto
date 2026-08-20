@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package staff;
+
+service StaffService {
+  rpc GetStaffProfileById (
+    GetStaffProfileRequest
+  ) returns (
+    StaffProfileResponse
+  );
+  rpc GetGuestAccessStatus (GetGuestAccessStatusRequest) returns (GuestAccessStatusResponse);
+}
+
+message GetStaffProfileRequest {
+  string id = 1;
+}
+
+message StaffProfileResponse {
+  string id = 1;
+  string fullName = 2;
+  string phoneNumber = 3;
+}
+
+message GetGuestAccessStatusRequest {
+  string staffId = 1;
+}
+
+message GuestAccessStatusResponse {
+  bool valid = 1;
+  string reasonCode = 2;
+  string requestId = 3;
+}
