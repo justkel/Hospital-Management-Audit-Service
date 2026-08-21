@@ -3,20 +3,26 @@ import {
   ExecutionContext,
   UnauthorizedException,
   CanActivate,
+  Inject,
 } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { ContextUser, StaffStatus } from '@justkel/shared';
+import { ContextUser, StaffStatus, UserRole, RMQ_TOPICS } from '@justkel/shared';
 import { GqlJwtAuthGuard } from '@justkel/shared';
 import { AuthClient } from 'src/sdk/auth.client';
+import { StaffClient } from 'src/sdk/staff.client';
 import { TokenBlacklistService } from 'src/services/token-blacklist.service';
 import { GraphQLError } from 'graphql';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class GqlJwtAuthGuardWithPV implements CanActivate {
   constructor(
     private readonly baseGuard: GqlJwtAuthGuard,
     private readonly authClient: AuthClient,
+    private readonly staffClient: StaffClient,
     private readonly blacklistService: TokenBlacklistService,
+    @Inject('HOSPITAL_MAIN_SERVICE')
+    private readonly mainServiceClient: ClientProxy,
   ) { }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -72,6 +78,45 @@ export class GqlJwtAuthGuardWithPV implements CanActivate {
       });
     }
 
+    if (staff.roles.includes(UserRole.GUEST)) {
+      await this.assertGuestAccessValid(user.sub);
+    }
+
     return true;
+  }
+
+  private async assertGuestAccessValid(staffId: string): Promise<void> {
+    let status: { valid: boolean; reasonCode: string; requestId?: string };
+
+    try {
+      status = await this.staffClient.getGuestAccessStatus(staffId);
+    } catch (error) {
+      console.error('Failed to verify guest access via gRPC:', error);
+      throw new GraphQLError('Unable to verify guest access', {
+        extensions: { code: 'GUEST_ACCESS_UNVERIFIABLE' },
+      });
+    }
+
+    if (!status.valid) {
+      if (status.reasonCode === 'GUEST_ACCESS_EXPIRED' && status.requestId) {
+        this.mainServiceClient.emit(RMQ_TOPICS.GUEST_REQUEST_EXPIRED_DETECTED, {
+          requestId: status.requestId,
+        });
+      }
+
+      throw new GraphQLError(
+        status.reasonCode === 'GUEST_BLOCKED'
+          ? 'Guest account is blocked'
+          : 'Guest access is not active, has expired, or has been revoked',
+        {
+          extensions: {
+            code:
+              status.reasonCode === 'GUEST_ACCESS_EXPIRED'
+                ? 'GUEST_ACCESS_DENIED'
+                : status.reasonCode || 'GUEST_ACCESS_DENIED',
+          },
+        },
+      );
+    }
   }
 }
