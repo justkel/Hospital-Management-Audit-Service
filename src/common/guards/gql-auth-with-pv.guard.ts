@@ -98,16 +98,20 @@ export class GqlJwtAuthGuardWithPV implements CanActivate {
     }
 
     if (!status.valid) {
-      if (status.reasonCode === 'GUEST_ACCESS_EXPIRED' && status.requestId) {
+      if (
+        (status.reasonCode === 'GUEST_ACCESS_EXPIRED' ||
+          status.reasonCode === 'GUEST_ACCESS_DISABLED') &&
+        status.requestId
+      ) {
         this.mainServiceClient.emit(RMQ_TOPICS.GUEST_REQUEST_EXPIRED_DETECTED, {
           requestId: status.requestId,
+          reason:
+            status.reasonCode === 'GUEST_ACCESS_EXPIRED' ? 'EXPIRED' : 'ORG_DISABLED',
         });
       }
 
       throw new GraphQLError(
-        status.reasonCode === 'GUEST_BLOCKED'
-          ? 'Guest account is blocked'
-          : 'Guest access is not active, has expired, or has been revoked',
+        this.getGuestAccessDenialMessage(status.reasonCode),
         {
           extensions: {
             code:
@@ -117,6 +121,17 @@ export class GqlJwtAuthGuardWithPV implements CanActivate {
           },
         },
       );
+    }
+  }
+
+  private getGuestAccessDenialMessage(reasonCode: string): string {
+    switch (reasonCode) {
+      case 'GUEST_BLOCKED':
+        return 'Guest account is blocked';
+      case 'GUEST_ACCESS_DISABLED':
+        return 'Guest access is disabled for this organization';
+      default:
+        return 'Guest access is not active, has expired, or has been revoked';
     }
   }
 }
