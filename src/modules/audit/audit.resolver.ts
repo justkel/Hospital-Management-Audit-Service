@@ -9,13 +9,14 @@ import {
   UserRole,
 } from '@justkel/shared';
 import { UseGuards } from '@nestjs/common';
-import { ActorActivityPeriod, AuditDistinctField } from 'src/enums/audit-log.enum';
+import { ActorActivityPeriod, AuditDistinctField, PeakHoursPeriod } from 'src/enums/audit-log.enum';
 import {
   AuditPaginationResult,
   AuditPaginationInput,
 } from 'src/graphql/types/paginate.type';
 import { GqlJwtAuthGuardWithPV } from 'src/common/guards/gql-auth-with-pv.guard';
 import { ActorActivityStats } from './types/actor-activity-stats.type';
+import { PeakHoursStats } from './types/peak-hours.type';
 
 @Resolver(() => AuditLog)
 export class AuditResolver {
@@ -68,4 +69,15 @@ export class AuditResolver {
   ) {
     return this.auditService.getActorActivityStats(user.org, user.sub, period);
   }
+
+  @Query(() => PeakHoursStats)
+  @UseGuards(GqlJwtAuthGuardWithPV)
+  async getOrganizationPeakHours(
+    @Args('period', { type: () => PeakHoursPeriod })
+    period: PeakHoursPeriod,
+    @GqlCurrentUser() user: ContextUser,
+  ): Promise<PeakHoursStats> {
+    return this.auditService.getPeakHoursStats(user.org, period);
+  }
+
 }

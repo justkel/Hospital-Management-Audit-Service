@@ -29,3 +29,16 @@ export enum ActorActivityPeriod {
 registerEnumType(ActorActivityPeriod, {
   name: 'ActorActivityPeriod',
 });
+
+export enum PeakHoursPeriod {
+  TODAY = 'TODAY',
+  THIS_WEEK = 'THIS_WEEK',
+  THIS_MONTH = 'THIS_MONTH',
+  LAST_7_DAYS = 'LAST_7_DAYS',
+  LAST_30_DAYS = 'LAST_30_DAYS',
+  LAST_3_MONTHS = 'LAST_3_MONTHS',
+}
+
+registerEnumType(PeakHoursPeriod, {
+  name: 'PeakHoursPeriod',
+});

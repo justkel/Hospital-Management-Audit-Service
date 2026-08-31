@@ -76,10 +76,38 @@ The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://
 """
 scalar JSON
 
+type PeakHour {
+  count: Int!
+  hour: String!
+  hourOfDay: Float!
+  percentage: Float!
+}
+
+enum PeakHoursPeriod {
+  LAST_3_MONTHS
+  LAST_7_DAYS
+  LAST_30_DAYS
+  THIS_MONTH
+  THIS_WEEK
+  TODAY
+}
+
+type PeakHoursStats {
+  averagePerHour: Int!
+  busiestHour: PeakHour
+  offPeakAverage: Int!
+  peakAverage: Int!
+  peakHours: [PeakHour!]!
+  percentPeak: Int!
+  period: String!
+  totalActivities: Int!
+}
+
 type Query {
   auditLogs(pagination: AuditPaginationInput!): AuditPaginationResult!
-  getActorActivityStats(actorId: String!, period: ActorActivityPeriod!): ActorActivityStats!
+  getActorActivityStats(period: ActorActivityPeriod!): ActorActivityStats!
   getAuditDistinctValues(field: AuditDistinctField!): [String!]!
   getAuditLogById(id: String!): AuditLog!
   getAuditLogs: [AuditLog!]!
+  getOrganizationPeakHours(period: PeakHoursPeriod!): PeakHoursStats!
 }
