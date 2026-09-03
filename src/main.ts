@@ -5,6 +5,7 @@ import { GatewayAccessGuard, RMQ_QUEUES } from '@justkel/shared';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableShutdownHooks();
   app.useGlobalGuards(new GatewayAccessGuard());
 
   app.connectMicroservice<MicroserviceOptions>({
@@ -31,4 +32,7 @@ async function bootstrap() {
   });
   console.log(`Audit Service running on http://localhost:${port}/graphql`);
 }
-bootstrap();
+bootstrap().catch((error) => {
+  console.error('Audit service bootstrap failed', error);
+  process.exitCode = 1;
+});

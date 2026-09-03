@@ -34,6 +34,13 @@ import { RedisModule } from './core/redis.module';
         autoLoadModels: true,
         synchronize: false,
         logging: false,
+        pool: {
+          max: 10,
+          min: 0,
+          acquire: 10000,
+          idle: 10000,
+          evict: 1000,
+        },
       }),
     }),
 
